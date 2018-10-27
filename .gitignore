@@ -14,3 +14,8 @@ src/www/static/docs
 src/config_prod.py
 src/run/*.pickle
 src/run/done/*.pickle
+
+# Covers JetBrains IntelliJ
+# Reference: https://intellij-support.jetbrains.com/hc/en-us/articles/206544839
+.idea/
+*.info.iml
