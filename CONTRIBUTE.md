@@ -8,7 +8,7 @@ In a nutshell, contributing data into MyVariant.info is just to provide us a dat
 ## General guidelines
 1. Code in Python (at least for now), and prefer in Python 3.
 2. Use hg19 or hg38 genome assembly for genomic coordinates (assuming we are dealing with human variants for now)
-3. all data plugins are located under [src/dataload/sources](src/dataload/sources) folder. You should follow this [sample_src example](src/dataload/sources/sample_src).
+3. all data plugins are located under [src/hub/dataload/sources](src/hub/dataload/sources) folder. You should follow this [sample_src example](src/hub/dataload/sources/sample_src).
 4. Each data plugin is one sub-folder under "sources", and the name of the sub-folder is typically the same as the root-level data_src key name, e.g. ["dbsnp" subfolder](/src/dataload/sources/dbsnp) handles all annoation data under "dbsnp" key.
 5. Other existing data plugin folders typically contain `*_upload.py` and `*_dump.py` files. You generally don't need to worry about the `Uploader` and `Dumper` classes in these files. Just follow the steps below to provide us a simple data parser. Once we verify your data parser, we will convert it to the formal `Uploader` and `Dumper` classes.
 
