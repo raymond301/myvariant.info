@@ -1,6 +1,5 @@
 __author__ = 'raymond301'
 import vcf
-
 from config import DATA_ARCHIVE_ROOT, logger as logging
 from biothings.utils.dataload import dict_sweep, unlist, value_convert_to_number
 from utils.hgvs import get_hgvs_from_vcf

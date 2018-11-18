@@ -1,32 +1,29 @@
 __author__ = 'raymond301'
-import glob, os
+import itertools, glob, os
 from .kgenomes_parser import load_data
 import biothings.hub.dataload.uploader as uploader
 from hub.dataload.uploader import SnpeffPostUpdateUploader
 
-class KgenomesBaseUploader(SnpeffPostUpdateUploader):
-    __metadata__ = {"mapper" : 'observed',
-                    "assembly" : "hg19",
-                    "src_meta" : {
-                        "url" : "http://exac.broadinstitute.org/",
-                        "license" : "ODbL",
-                        "license_url" : "http://exac.broadinstitute.org/terms",
-                        "license_url_short": "nnn"
-                    }
-                    }
+class KgenomesBaseUploader(uploader.IgnoreDuplicatedSourceUploader,
+                           uploader.ParallelizedSourceUploader,
+                           SnpeffPostUpdateUploader):
 
+    def jobs(self):
+        files = glob.glob(os.path.join(self.data_folder,self.__class__.GLOB_PATTERN))
+        if len(files) != 1:
+            raise uploader.ResourceError("Expected 1 files, got: %s" % files)
+        chrom_list = [str(i) for i in range(1, 23)] + ['X', 'Y', 'MT']
+        return list(itertools.product(files,chrom_list))
 
-class KgenomesUploader(KgenomesBaseUploader):
-    name = "kgenomes"
-    main_source= "1000genomes"
+    def load_data(self,input_file,chrom):
+        self.logger.info("Load data from '%s' for chr %s" % (input_file,chrom))
+        return load_data(self.__class__.__metadata__["assembly"],input_file,chrom)
 
-    def load_data(self,data_folder):
-        content = glob.glob(os.path.join(data_folder,"*.genotypes.vcf"))
-        if len(content) != 1:
-            raise uploader.ResourceError("Expecting one single vcf file, got: %s" % repr(content))
-        input_file = content.pop()
-        self.logger.info("Load data from file '%s'" % input_file)
-        return load_data(self.__class__.name, input_file)
+    def post_update_data(self, *args, **kwargs):
+        super(KgenomesBaseUploader,self).post_update_data(*args,**kwargs)
+        self.logger.info("Indexing 'rsid'")
+        # background=true or it'll lock the whole database...
+        self.collection.create_index("dbsnp.rsid",background=True)
 
     @classmethod
     def get_mapping(klass):
@@ -131,3 +128,20 @@ class KgenomesUploader(KgenomesBaseUploader):
             },
         }
         return mapping
+
+
+class KgenomesUploader(KgenomesBaseUploader):
+    name = "kgenomes"
+    main_source= "kgenomes"
+
+    __metadata__ = {"mapper" : 'observed',
+                    "assembly" : "hg19",
+                    "src_meta" : {
+                        "url" : "http://www.internationalgenome.org/about",
+                        "license" : "Creative Commons",
+                        "license_url" : "http://www.internationalgenome.org/announcements/data-management-and-community-access-paper-published-2012-04-29/",
+                        "license_url_short": "nnn"
+                    }
+                    }
+    GLOB_PATTERN = ".*\.genotypes\.vcf\.gz$"
+
