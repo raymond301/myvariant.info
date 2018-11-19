@@ -45,7 +45,8 @@ class KGenomeDumper(FTPDumper):
 
     def create_todump_list(self, force=False):
         self.get_newest_info()
-        for filename in self.newest_files[13:14]:
+        # for filename in self.newest_files[13:14]: # use this for debugging, will only pull the chr21 file
+        for filename in self.newest_files:
             new_localfile = os.path.join(self.new_data_folder,os.path.basename(filename))
             try:
                 current_localfile = os.path.join(self.current_data_folder,os.path.basename(filename))

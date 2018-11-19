@@ -9,6 +9,14 @@ class KgenomesBaseUploader(uploader.IgnoreDuplicatedSourceUploader,
                            uploader.ParallelizedSourceUploader,
                            SnpeffPostUpdateUploader):
 
+    def get_pinfo(self):
+        pinfo = super(KgenomesBaseUploader,self).get_pinfo()
+        # clinvar parser has some memory requirements, ~1.5G
+        logging.debug( pinfo )
+        pinfo.setdefault("__reqs__",{})["mem"] = 12 * (1024**3)
+        #logging.debug(  pinfo.setdefault("__reqs__",{})["mem"]  )
+        return pinfo
+
     def jobs(self):
         files = glob.glob(os.path.join(self.data_folder,self.__class__.GLOB_PATTERN))
         logging.debug(os.path.join(self.data_folder,self.__class__.GLOB_PATTERN))
@@ -23,9 +31,9 @@ class KgenomesBaseUploader(uploader.IgnoreDuplicatedSourceUploader,
 
     def post_update_data(self, *args, **kwargs):
         super(KgenomesBaseUploader,self).post_update_data(*args,**kwargs)
-        self.logger.info("Indexing 'rsid'")
+        #self.logger.info("Indexing 'rsid'")
         # background=true or it'll lock the whole database...
-        self.collection.create_index("dbsnp.rsid",background=True)
+        #self.collection.create_index("dbsnp.rsid",background=True)
 
     @classmethod
     def get_mapping(klass):
