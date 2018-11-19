@@ -1,5 +1,6 @@
 __author__ = 'raymond301'
 import itertools, glob, os
+from config import DATA_ARCHIVE_ROOT, logger as logging
 from .kgenomes_parser import load_data
 import biothings.hub.dataload.uploader as uploader
 from hub.dataload.uploader import SnpeffPostUpdateUploader
@@ -10,6 +11,7 @@ class KgenomesBaseUploader(uploader.IgnoreDuplicatedSourceUploader,
 
     def jobs(self):
         files = glob.glob(os.path.join(self.data_folder,self.__class__.GLOB_PATTERN))
+        logging.debug(os.path.join(self.data_folder,self.__class__.GLOB_PATTERN))
         if len(files) != 1:
             raise uploader.ResourceError("Expected 1 files, got: %s" % files)
         chrom_list = [str(i) for i in range(1, 23)] + ['X', 'Y', 'MT']
@@ -143,5 +145,5 @@ class KgenomesUploader(KgenomesBaseUploader):
                         "license_url_short": "nnn"
                     }
                     }
-    GLOB_PATTERN = ".*\.genotypes\.vcf\.gz$"
+    GLOB_PATTERN = "*.genotypes.vcf"
 

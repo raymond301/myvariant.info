@@ -16,7 +16,7 @@ from biothings.utils.common import gunzipall
 # ftp://ftp.1000genomes.ebi.ac.uk/vol1/ftp/release/20130502/ALL.chrMT.phase3_callmom-v0_4.20130502.genotypes.vcf.gz
 
 class KGenomeDumper(FTPDumper):
-    SRC_NAME = "1000genomes"
+    SRC_NAME = "kgenomes"
     SRC_ROOT_FOLDER = os.path.join(DATA_ARCHIVE_ROOT, 'kgenomes')
     FTP_HOST = 'ftp.1000genomes.ebi.ac.uk'
     CWD_DIR = '/vol1/ftp/release/' # want 20130502 release
@@ -28,7 +28,7 @@ class KGenomeDumper(FTPDumper):
         # so we need to parse directory names
         releases = self.client.nlst()
         # sort items based on k
-        logging.debug("Yup - "+str(random.randint(1,10)))
+        #logging.debug("Yup - "+str(random.randint(1,10)))
         self.release = sorted(releases)[-1]
         contents = self.client.nlst(self.release)
         pat = re.compile(self.__class__.FILE_PATTERN)
@@ -45,7 +45,7 @@ class KGenomeDumper(FTPDumper):
 
     def create_todump_list(self, force=False):
         self.get_newest_info()
-        for filename in self.newest_files:
+        for filename in self.newest_files[13:14]:
             new_localfile = os.path.join(self.new_data_folder,os.path.basename(filename))
             try:
                 current_localfile = os.path.join(self.current_data_folder,os.path.basename(filename))
